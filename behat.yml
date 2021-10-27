@@ -1,0 +1,62 @@
+default:
+  suites:
+    default:
+      paths:
+        features: '/Applications/MAMP/htdocs/features'
+      contexts:
+        - FeatureContext
+        - Drupal\DrupalExtension\Context\DrupalContext
+        - Drupal\DrupalExtension\Context\MinkContext
+        - Drupal\DrupalExtension\Context\MessageContext
+        - Drupal\DrupalExtension\Context\DrushContext
+        - Drupal\DrupalExtension\Context\MailContext
+        - Drupal\DrupalExtension\Context\RawMailContext
+        - emuse\BehatHTMLFormatter\Context\ScreenshotContext:
+              screenshotDir: report/html/behat/assets/screenshots
+  formatters:
+    html:
+      output_path: %paths.base%/build/html/behat
+  extensions:
+    Drupal\MinkExtension:
+      goutte: ~
+      browser_name: 'chrome'
+      javascript_session: selenium2
+      selenium2:
+          wd_host: http://127.0.0.1:4444/wd/hub
+          capabilities: { "version": "*", 'chrome': { 'switches': [ '--start-maximized','--window-size=1920,1080'] } }
+#         capabilities: { "version": "*", 'chrome': { 'switches': [ '--headless','--disable-gpu','--window-size=1920,1080' ] } }
+
+      base_url: http://localhost:8888
+      files_path:  "%paths.base%/media/images"
+    Drupal\DrupalExtension:
+      blackbox: ~
+      api_driver: 'drupal'
+      drush:
+        alias: 'local'
+      drupal:
+        drupal_root: '/Applications/MAMP/htdocs/'
+      region_map:
+        preheader: ".region-pre-header"
+        header: ".region-header"
+        highlighted: ".region-highlighted"
+        footer: ".region-footer"
+        content_bottom: ".region-content-bottom"
+        bottom: ".region-bottom"
+        content: ".region-content"
+      selectors:
+          message_selector: '.messages'
+          error_message_selector: '.messages--error'
+          success_message_selector: '.messages--status'
+          warning_message_selector: '.messages--warning'
+    Bex\Behat\ScreenshotExtension:
+        screenshot_taking_mode: failed_scenarios
+        image_drivers:
+          local:
+            screenshot_directory: "%paths.base%/media/failed_screenshots"
+    emuse\BehatHTMLFormatter\BehatHTMLFormatterExtension:
+     name: html
+     renderer: Twig,Behat2
+     file_name: index
+     print_args: true
+     print_outp: true
+     loop_break: true
